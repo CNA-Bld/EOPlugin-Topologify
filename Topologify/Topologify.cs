@@ -20,6 +20,7 @@ namespace Topologify
 	    {
 		    return new ToolForm(this);
 	    }
+		public override string Version { get { return "<BUILD_VERSION>"; } }
 
 		private static string JSON_PATH = @"Data\quest.json";
 		private static Uri JSON_URL = new Uri("https://kcwikizh.github.io/kcdata/quest/all.json");
