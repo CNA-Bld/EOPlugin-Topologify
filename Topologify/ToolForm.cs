@@ -105,7 +105,10 @@ namespace Topologify
 				{
 					if (!KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) && quest.Prerequisite.All(q => plugin.Quests[q].isCompleted))
 					{
-						quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
+						if (quest.Prerequisite.Any(q => plugin.Quests[q].Completed != ExtendedQuestData.Status.DerivedCompleted))
+							quest.Completed = ExtendedQuestData.Status.MarkedTreeCompleted;
+						else
+							quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
 						flag = true;
 					}
 				}
@@ -147,6 +150,13 @@ namespace Topologify
 				MessageBoxDefaultButton.Button2
 				) == DialogResult.Yes)
 			{
+				if (quest.Completed == ExtendedQuestData.Status.DerivedUncompleted ||
+				    BuildPrerequisiteTree(quest).Any(q => q.Completed == ExtendedQuestData.Status.DerivedUncompleted))
+				{
+					MessageBox.Show("Impossible lah.");
+					return;
+				}
+
 				MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
 				quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
 				TryTopologifyReversed();
