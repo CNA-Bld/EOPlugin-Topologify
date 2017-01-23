@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtendedQuestData.cs" />
+    <Compile Include="Record.cs" />
     <Compile Include="ToolForm.cs">
       <SubType>Form</SubType>
     </Compile>

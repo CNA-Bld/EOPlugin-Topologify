@@ -124,6 +124,20 @@ namespace Topologify
 				ext.Completed = ExtendedQuestData.Status.DerivedUncompleted;
 			}
 
+			Record RecordData = plugin.LoadRecord();
+			foreach (var id in RecordData.DerivedCompleted)
+			{
+				var quest = plugin.Quests[id];
+				MarkQuestTree(quest, ExtendedQuestData.Status.DerivedCompleted);
+				quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
+			}
+			foreach (var id in RecordData.MarkedCompleted)
+			{
+				var quest = plugin.Quests[id];
+				MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
+				quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
+			}
+
 			TryTopologifyReversed();
 		}
 
@@ -151,7 +165,7 @@ namespace Topologify
 				) == DialogResult.Yes)
 			{
 				if (quest.Completed == ExtendedQuestData.Status.DerivedUncompleted ||
-				    BuildPrerequisiteTree(quest).Any(q => q.Completed == ExtendedQuestData.Status.DerivedUncompleted))
+				    BuildPrerequisiteTree(quest).Any(q => (!q.Recurring) && q.Completed == ExtendedQuestData.Status.DerivedUncompleted))
 				{
 					MessageBox.Show("Impossible lah.");
 					return;
@@ -162,6 +176,11 @@ namespace Topologify
 				TryTopologifyReversed();
 				RefreshView();
 			}
+		}
+
+		private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			plugin.SaveRecord();
 		}
 	}
 }

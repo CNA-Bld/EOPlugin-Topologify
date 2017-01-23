@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Codeplex.Data;
 using ElectronicObserver.Data;
+using ElectronicObserver.Utility;
 using ElectronicObserver.Window.Plugins;
 
 namespace Topologify
@@ -21,10 +22,12 @@ namespace Topologify
 
 		private static string JSON_PATH = @"Data\quest.json";
 		private static Uri JSON_URL = new Uri("https://kcwikizh.github.io/kcdata/quest/all.json");
+		private static string RECORD_PATH = @"Record\Topologify.json";
 
-	    public Topologify()
+		public Topologify()
 	    {
 		    LoadData();
+			LoadRecord();
 	    }
 
 		public Dictionary<int, ExtendedQuestData> Quests = new Dictionary<int, ExtendedQuestData>();
@@ -45,5 +48,23 @@ namespace Topologify
 				}
 			}
 		}
-	}
+
+	    public Record LoadRecord()
+	    {
+		    if (File.Exists(RECORD_PATH))
+			    return DynamicJson.Parse(File.ReadAllText(RECORD_PATH)).Deserialize<Record>();
+		    else
+				return new Record();
+	    }
+
+	    public void SaveRecord()
+	    {
+			var RecordData = new Record();
+		    RecordData.DerivedCompleted =
+			    Quests.Values.Where(q => q.Completed == ExtendedQuestData.Status.DerivedCompleted).Select(q => q.ID).ToList();
+		    RecordData.MarkedCompleted =
+			    Quests.Values.Where(q => q.Completed == ExtendedQuestData.Status.MarkedCompleted).Select(q => q.ID).ToList();
+			File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(RecordData));
+	    }
+    }
 }

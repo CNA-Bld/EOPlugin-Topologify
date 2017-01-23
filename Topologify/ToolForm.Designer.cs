@@ -182,6 +182,7 @@
 			this.Controls.Add(this.tableLayoutPanel);
 			this.Name = "ToolForm";
 			this.Text = "Topologify";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ToolForm_FormClosing);
 			this.Load += new System.EventHandler(this.ToolForm_Load);
 			this.tableLayoutPanel.ResumeLayout(false);
 			this.tableLayoutPanel.PerformLayout();
