@@ -218,5 +218,43 @@ namespace Topologify
 				}
 			}
 		}
+
+		private void buttonReset_Click(object sender, EventArgs e)
+		{
+			contextMenuStripReset.Show(buttonReset, new Point(0, buttonReset.Height));
+		}
+
+		private void doReset(string message, Func<ExtendedQuestData, bool> where)
+		{
+			if (MessageBox.Show(
+				message, "Confirm",
+				MessageBoxButtons.YesNo,
+				MessageBoxIcon.Warning,
+				MessageBoxDefaultButton.Button2
+				) == DialogResult.Yes)
+			{
+				foreach (var quest in plugin.Quests.Values.Where(where))
+				{
+					quest.Completed = ExtendedQuestData.Status.Unknown;
+				}
+				MessageBox.Show("Topologify will now close.");
+				Close();
+			}
+		}
+
+		private void aggressivelyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			doReset("Sure to reset all aggressively marked quests?", q => q.isAggressive);
+		}
+
+		private void manuallyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			doReset("Sure to reset all manually marked quests?", q => q.isManual);
+		}
+
+		private void everythingToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			doReset("Sure to reset everything?", q => true);
+		}
 	}
 }

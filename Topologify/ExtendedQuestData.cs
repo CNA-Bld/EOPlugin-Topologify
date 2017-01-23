@@ -31,6 +31,14 @@ namespace Topologify
 		public bool isDerivedCompleted
 			=> Completed == Status.AggressiveDerivedCompleted || Completed == Status.DerivedCompleted;
 
+		public bool isAggressive
+			=> Completed == Status.AggressiveDerivedCompleted || Completed == Status.AggressiveMarkedCompleted;
+
+		public bool isManual
+			=>
+				Completed == Status.AggressiveMarkedCompleted || Completed == Status.MarkedCompleted ||
+				Completed == Status.MarkedTreeCompleted;
+
 		public string Description => string.Format("({0}) {1} {2}", ID, WikiID, Title);
 
 		public static ExtendedQuestData FromJson(dynamic json)

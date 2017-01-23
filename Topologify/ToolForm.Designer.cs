@@ -30,7 +30,7 @@
 		{
 			this.components = new System.ComponentModel.Container();
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-			this.buttonMark = new System.Windows.Forms.Button();
+			this.buttonReset = new System.Windows.Forms.Button();
 			this.buttonUpdate = new System.Windows.Forms.Button();
 			this.dataGridView = new System.Windows.Forms.DataGridView();
 			this.ColumnDisplayed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -38,13 +38,18 @@
 			this.ColumnWikiId = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.ColumnCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.ColumnTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.contextMenuStripMark = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.markAsCompletedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.linkLabel = new System.Windows.Forms.LinkLabel();
 			this.checkBoxAllowReverse = new System.Windows.Forms.CheckBox();
+			this.contextMenuStripReset = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.aggressivelyMarkedQuestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.manuallyMarkedQuestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.everythingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.tableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
-			this.contextMenuStrip.SuspendLayout();
+			this.contextMenuStripMark.SuspendLayout();
+			this.contextMenuStripReset.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel
@@ -54,7 +59,7 @@
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel.Controls.Add(this.buttonMark, 2, 0);
+			this.tableLayoutPanel.Controls.Add(this.buttonReset, 2, 0);
 			this.tableLayoutPanel.Controls.Add(this.buttonUpdate, 3, 0);
 			this.tableLayoutPanel.Controls.Add(this.dataGridView, 0, 1);
 			this.tableLayoutPanel.Controls.Add(this.linkLabel, 0, 2);
@@ -69,17 +74,18 @@
 			this.tableLayoutPanel.Size = new System.Drawing.Size(584, 361);
 			this.tableLayoutPanel.TabIndex = 0;
 			// 
-			// buttonMark
+			// buttonReset
 			// 
-			this.buttonMark.AutoSize = true;
-			this.buttonMark.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.buttonMark.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.buttonMark.Location = new System.Drawing.Point(452, 3);
-			this.buttonMark.Name = "buttonMark";
-			this.buttonMark.Size = new System.Drawing.Size(45, 23);
-			this.buttonMark.TabIndex = 0;
-			this.buttonMark.Text = "Reset";
-			this.buttonMark.UseVisualStyleBackColor = true;
+			this.buttonReset.AutoSize = true;
+			this.buttonReset.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.buttonReset.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.buttonReset.Location = new System.Drawing.Point(452, 3);
+			this.buttonReset.Name = "buttonReset";
+			this.buttonReset.Size = new System.Drawing.Size(45, 23);
+			this.buttonReset.TabIndex = 0;
+			this.buttonReset.Text = "Reset";
+			this.buttonReset.UseVisualStyleBackColor = true;
+			this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
 			// 
 			// buttonUpdate
 			// 
@@ -107,7 +113,7 @@
             this.ColumnCategory,
             this.ColumnTitle});
 			this.tableLayoutPanel.SetColumnSpan(this.dataGridView, 4);
-			this.dataGridView.ContextMenuStrip = this.contextMenuStrip;
+			this.dataGridView.ContextMenuStrip = this.contextMenuStripMark;
 			this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.dataGridView.Location = new System.Drawing.Point(3, 32);
 			this.dataGridView.Name = "dataGridView";
@@ -123,7 +129,7 @@
 			this.ColumnDisplayed.HeaderText = "";
 			this.ColumnDisplayed.Name = "ColumnDisplayed";
 			this.ColumnDisplayed.ReadOnly = true;
-			this.ColumnDisplayed.Width = 21;
+			this.ColumnDisplayed.Width = 5;
 			// 
 			// ColumnId
 			// 
@@ -153,12 +159,12 @@
 			this.ColumnTitle.ReadOnly = true;
 			this.ColumnTitle.Width = 52;
 			// 
-			// contextMenuStrip
+			// contextMenuStripMark
 			// 
-			this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.contextMenuStripMark.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.markAsCompletedToolStripMenuItem});
-			this.contextMenuStrip.Name = "contextMenuStrip";
-			this.contextMenuStrip.Size = new System.Drawing.Size(178, 26);
+			this.contextMenuStripMark.Name = "contextMenuStrip";
+			this.contextMenuStripMark.Size = new System.Drawing.Size(178, 26);
 			// 
 			// markAsCompletedToolStripMenuItem
 			// 
@@ -191,6 +197,36 @@
 			this.checkBoxAllowReverse.UseVisualStyleBackColor = true;
 			this.checkBoxAllowReverse.CheckedChanged += new System.EventHandler(this.checkBoxAllowReverse_CheckedChanged);
 			// 
+			// contextMenuStripReset
+			// 
+			this.contextMenuStripReset.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aggressivelyMarkedQuestsToolStripMenuItem,
+            this.manuallyMarkedQuestsToolStripMenuItem,
+            this.everythingToolStripMenuItem});
+			this.contextMenuStripReset.Name = "contextMenuStripReset";
+			this.contextMenuStripReset.Size = new System.Drawing.Size(223, 70);
+			// 
+			// aggressivelyMarkedQuestsToolStripMenuItem
+			// 
+			this.aggressivelyMarkedQuestsToolStripMenuItem.Name = "aggressivelyMarkedQuestsToolStripMenuItem";
+			this.aggressivelyMarkedQuestsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+			this.aggressivelyMarkedQuestsToolStripMenuItem.Text = "Aggressively Marked Quests";
+			this.aggressivelyMarkedQuestsToolStripMenuItem.Click += new System.EventHandler(this.aggressivelyMarkedQuestsToolStripMenuItem_Click);
+			// 
+			// manuallyMarkedQuestsToolStripMenuItem
+			// 
+			this.manuallyMarkedQuestsToolStripMenuItem.Name = "manuallyMarkedQuestsToolStripMenuItem";
+			this.manuallyMarkedQuestsToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+			this.manuallyMarkedQuestsToolStripMenuItem.Text = "Manually Marked Quests";
+			this.manuallyMarkedQuestsToolStripMenuItem.Click += new System.EventHandler(this.manuallyMarkedQuestsToolStripMenuItem_Click);
+			// 
+			// everythingToolStripMenuItem
+			// 
+			this.everythingToolStripMenuItem.Name = "everythingToolStripMenuItem";
+			this.everythingToolStripMenuItem.Size = new System.Drawing.Size(222, 22);
+			this.everythingToolStripMenuItem.Text = "Everything";
+			this.everythingToolStripMenuItem.Click += new System.EventHandler(this.everythingToolStripMenuItem_Click);
+			// 
 			// ToolForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -204,7 +240,8 @@
 			this.tableLayoutPanel.ResumeLayout(false);
 			this.tableLayoutPanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
-			this.contextMenuStrip.ResumeLayout(false);
+			this.contextMenuStripMark.ResumeLayout(false);
+			this.contextMenuStripReset.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -212,7 +249,7 @@
 		#endregion
 
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
-		private System.Windows.Forms.Button buttonMark;
+		private System.Windows.Forms.Button buttonReset;
 		private System.Windows.Forms.Button buttonUpdate;
 		private System.Windows.Forms.DataGridView dataGridView;
 		private System.Windows.Forms.LinkLabel linkLabel;
@@ -221,8 +258,12 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn ColumnWikiId;
 		private System.Windows.Forms.DataGridViewTextBoxColumn ColumnCategory;
 		private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTitle;
-		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStripMark;
 		private System.Windows.Forms.ToolStripMenuItem markAsCompletedToolStripMenuItem;
 		private System.Windows.Forms.CheckBox checkBoxAllowReverse;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStripReset;
+		private System.Windows.Forms.ToolStripMenuItem aggressivelyMarkedQuestsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem manuallyMarkedQuestsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem everythingToolStripMenuItem;
 	}
 }
