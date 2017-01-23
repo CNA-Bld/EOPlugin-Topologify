@@ -16,6 +16,7 @@ namespace Topologify
 	public partial class ToolForm : Form
 	{
 		private Topologify plugin;
+		private bool shouldSave = false;
 		
 		public ToolForm(Topologify plugin)
 		{
@@ -31,6 +32,9 @@ namespace Topologify
 				Close();
 				return;
 			}
+
+			if (plugin.Quests.Count > 0)
+				shouldSave = true;
 
 			TryTopologify();
 			RefreshView();
@@ -189,7 +193,8 @@ namespace Topologify
 
 		private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			plugin.SaveRecord();
+			if (shouldSave)
+				plugin.SaveRecord();
 		}
 
 		private void checkBoxAllowReverse_CheckedChanged(object sender, EventArgs e)
@@ -206,7 +211,7 @@ namespace Topologify
 						"DO NOT USE THIS WHEN THERE ARE STILL 検証中!",
 						"",
 						"",
-						"Should Topologify aggressively check all quests now?"
+						"Should Topologify enable this and aggressively check all quests now?"
 						), "Confirm",
 					MessageBoxButtons.YesNo,
 					MessageBoxIcon.Warning,
@@ -215,6 +220,10 @@ namespace Topologify
 				{
 					TryTopologifyReversed();
 					RefreshView();
+				}
+				else
+				{
+					checkBoxAllowReverse.Checked = false;
 				}
 			}
 		}
