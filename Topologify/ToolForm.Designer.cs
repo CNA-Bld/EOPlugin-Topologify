@@ -98,6 +98,7 @@
 			this.buttonUpdate.TabIndex = 1;
 			this.buttonUpdate.Text = "Update Data";
 			this.buttonUpdate.UseVisualStyleBackColor = true;
+			this.buttonUpdate.Click += new System.EventHandler(this.buttonUpdate_Click);
 			// 
 			// dataGridView
 			// 

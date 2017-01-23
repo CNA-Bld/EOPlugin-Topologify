@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -27,7 +28,6 @@ namespace Topologify
 		public Topologify()
 	    {
 		    LoadData();
-			LoadRecord();
 	    }
 
 		public Dictionary<int, ExtendedQuestData> Quests = new Dictionary<int, ExtendedQuestData>();
@@ -71,5 +71,23 @@ namespace Topologify
 	    {
 			return Quests.Values.Where(q => q.Completed == status).Select(q => q.ID).ToList();
 		}
+
+	    public void UpdateData(Action action)
+	    {
+		    WebClient client = new WebClient();
+			client.Encoding = Encoding.UTF8;
+		    client.DownloadFileCompleted += (sender, e) =>
+		    {
+			    if (e.Error != null)
+			    {
+				    ErrorReporter.SendErrorReport(e.Error, "Error when updating data.");
+				    return;
+			    }
+
+			    LoadData();
+			    action();
+		    };
+			client.DownloadFileAsync(JSON_URL, JSON_PATH);
+	    }
     }
 }

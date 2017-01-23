@@ -265,5 +265,19 @@ namespace Topologify
 		{
 			doReset("Sure to reset everything?", q => true);
 		}
+
+		private void OnUpdated()
+		{
+			MessageBox.Show("Data updated. Topologify will now close.");
+			TryTopologify();
+			Close();
+		}
+
+		private void buttonUpdate_Click(object sender, EventArgs e)
+		{
+			buttonUpdate.Enabled = false;
+			buttonUpdate.Text = "Updating...";
+			plugin.UpdateData(OnUpdated);
+		}
 	}
 }
