@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -283,6 +284,11 @@ namespace Topologify
 			buttonUpdate.Enabled = false;
 			buttonUpdate.Text = "Updating...";
 			plugin.UpdateData(OnUpdated);
+		}
+
+		private void linkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			Process.Start("http://kcwikizh.github.io/kcdata/");
 		}
 	}
 }

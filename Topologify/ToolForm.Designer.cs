@@ -184,7 +184,8 @@
 			this.linkLabel.Size = new System.Drawing.Size(578, 13);
 			this.linkLabel.TabIndex = 3;
 			this.linkLabel.TabStop = true;
-			this.linkLabel.Text = "linkLabel1";
+			this.linkLabel.Text = "Data from kcwikizh/kcdata";
+			this.linkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
 			// 
 			// checkBoxAllowReverse
 			// 
