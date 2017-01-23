@@ -51,7 +51,7 @@ namespace Topologify
 				row.Cells[ColumnDisplayed.Index].Value = KCDatabase.Instance.Quest.Quests.ContainsKey(ext.ID);
 				row.Cells[ColumnId.Index].Value = ext.ID;
 				row.Cells[ColumnWikiId.Index].Value = ext.WikiID;
-				row.Cells[ColumnCategory.Index].Value = ext.Category;
+				row.Cells[ColumnCategory.Index].Value = Constants.GetQuestCategory(ext.Category);
 				row.Cells[ColumnTitle.Index].Value = ext.Title;
 
 				var tree = BuildPrerequisiteTree(ext);
