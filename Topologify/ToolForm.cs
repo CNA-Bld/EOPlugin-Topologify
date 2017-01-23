@@ -108,10 +108,10 @@ namespace Topologify
 				{
 					if (!KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) && quest.Prerequisite.All(q => plugin.Quests[q].isCompleted))
 					{
-						if (quest.Prerequisite.Any(q => plugin.Quests[q].Completed != ExtendedQuestData.Status.DerivedCompleted))
-							quest.Completed = ExtendedQuestData.Status.MarkedTreeCompleted;
+						if (quest.Prerequisite.Any(q => !plugin.Quests[q].isDerivedCompleted))
+							quest.Completed = ExtendedQuestData.Status.AggressiveMarkedCompleted;
 						else
-							quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
+							quest.Completed = ExtendedQuestData.Status.AggressiveDerivedCompleted;
 						flag = true;
 					}
 				}
@@ -128,17 +128,25 @@ namespace Topologify
 			}
 
 			Record RecordData = plugin.LoadRecord();
-			foreach (var id in RecordData.DerivedCompleted)
+			RestoreStatus(RecordData.DerivedCompleted, ExtendedQuestData.Status.DerivedCompleted,
+				ExtendedQuestData.Status.DerivedCompleted);
+			RestoreStatus(RecordData.MarkedCompleted, ExtendedQuestData.Status.MarkedCompleted,
+				ExtendedQuestData.Status.MarkedTreeCompleted);
+			RestoreStatus(RecordData.AggressiveDerivedCompleted, ExtendedQuestData.Status.AggressiveDerivedCompleted, null);
+			RestoreStatus(RecordData.AggressiveMarkedCompleted, ExtendedQuestData.Status.AggressiveMarkedCompleted, null);
+		}
+
+		private void RestoreStatus(List<int> questIds, ExtendedQuestData.Status thisStatus,
+			ExtendedQuestData.Status? treeStatus)
+		{
+			foreach (var id in questIds)
 			{
 				var quest = plugin.Quests[id];
-				MarkQuestTree(quest, ExtendedQuestData.Status.DerivedCompleted);
-				quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
-			}
-			foreach (var id in RecordData.MarkedCompleted)
-			{
-				var quest = plugin.Quests[id];
-				MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
-				quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
+				if (quest.isCompleted)
+					continue;
+				if (treeStatus != null)
+					MarkQuestTree(quest, treeStatus.Value);
+				quest.Completed = thisStatus;
 			}
 		}
 

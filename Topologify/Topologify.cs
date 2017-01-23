@@ -60,11 +60,16 @@ namespace Topologify
 	    public void SaveRecord()
 	    {
 			var RecordData = new Record();
-		    RecordData.DerivedCompleted =
-			    Quests.Values.Where(q => q.Completed == ExtendedQuestData.Status.DerivedCompleted).Select(q => q.ID).ToList();
-		    RecordData.MarkedCompleted =
-			    Quests.Values.Where(q => q.Completed == ExtendedQuestData.Status.MarkedCompleted).Select(q => q.ID).ToList();
+		    RecordData.DerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.DerivedCompleted);
+		    RecordData.MarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.MarkedCompleted);
+		    RecordData.AggressiveDerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveDerivedCompleted);
+		    RecordData.AggressiveMarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveMarkedCompleted);
 			File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(RecordData));
 	    }
+
+	    private List<int> BuildQuestIds(ExtendedQuestData.Status status)
+	    {
+			return Quests.Values.Where(q => q.Completed == status).Select(q => q.ID).ToList();
+		}
     }
 }

@@ -18,14 +18,18 @@ namespace Topologify
 
 		public enum Status
 		{
-			Unknown, DerivedCompleted, DerivedUncompleted, MarkedCompleted, MarkedTreeCompleted
+			Unknown, DerivedCompleted, DerivedUncompleted, MarkedCompleted, MarkedTreeCompleted, AggressiveDerivedCompleted, AggressiveMarkedCompleted
 		}
 		public Status Completed { get; set; }
 
 		public bool isCompleted
 			=>
 				Completed == Status.DerivedCompleted || Completed == Status.MarkedCompleted ||
-				Completed == Status.MarkedTreeCompleted;
+				Completed == Status.MarkedTreeCompleted || Completed == Status.AggressiveDerivedCompleted ||
+				Completed == Status.AggressiveMarkedCompleted;
+
+		public bool isDerivedCompleted
+			=> Completed == Status.AggressiveDerivedCompleted || Completed == Status.DerivedCompleted;
 
 		public string Description => string.Format("({0}) {1} {2}", ID, WikiID, Title);
 
