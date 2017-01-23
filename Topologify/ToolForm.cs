@@ -16,7 +16,7 @@ namespace Topologify
 	public partial class ToolForm : Form
 	{
 		private Topologify plugin;
-		private bool shouldSave = false;
+		private bool isQuestDataAvailable = false;
 		
 		public ToolForm(Topologify plugin)
 		{
@@ -34,7 +34,7 @@ namespace Topologify
 			}
 
 			if (plugin.Quests.Count > 0)
-				shouldSave = true;
+				isQuestDataAvailable = true;
 
 			TryTopologify();
 			RefreshView();
@@ -126,10 +126,15 @@ namespace Topologify
 		{
 			foreach (var id in KCDatabase.Instance.Quest.Quests.Keys)
 			{
+				if (!plugin.Quests.ContainsKey(id))
+					continue;
 				var ext = plugin.Quests[id];
 				MarkQuestTree(ext, ExtendedQuestData.Status.DerivedCompleted);
 				ext.Completed = ExtendedQuestData.Status.DerivedUncompleted;
 			}
+
+			if (plugin.Quests.Count == 0)
+				return;
 
 			Record RecordData = plugin.LoadRecord();
 			RestoreStatus(RecordData.DerivedCompleted, ExtendedQuestData.Status.DerivedCompleted,
@@ -193,7 +198,7 @@ namespace Topologify
 
 		private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (shouldSave)
+			if (isQuestDataAvailable)
 				plugin.SaveRecord();
 		}
 
