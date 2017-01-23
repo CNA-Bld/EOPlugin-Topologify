@@ -97,6 +97,9 @@ namespace Topologify
 
 		private void TryTopologifyReversed()
 		{
+			if (!checkBoxAllowReverse.Checked)
+				return;
+
 			bool flag = true;
 			while (flag)
 			{
@@ -137,8 +140,6 @@ namespace Topologify
 				MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
 				quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
 			}
-
-			TryTopologifyReversed();
 		}
 
 		private void dataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
@@ -181,6 +182,33 @@ namespace Topologify
 		private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			plugin.SaveRecord();
+		}
+
+		private void checkBoxAllowReverse_CheckedChanged(object sender, EventArgs e)
+		{
+			if (checkBoxAllowReverse.Checked)
+			{
+				if (MessageBox.Show(
+					string.Join("\n",
+						"Enabling this will cause Topologify to consider all quests",
+						"1) not displaying",
+						"2) whose prerequisite are completed",
+						"as completed.",
+						"",
+						"DO NOT USE THIS WHEN THERE ARE STILL 検証中!",
+						"",
+						"",
+						"Should Topologify aggressively check all quests now?"
+						), "Confirm",
+					MessageBoxButtons.YesNo,
+					MessageBoxIcon.Warning,
+					MessageBoxDefaultButton.Button2
+					) == DialogResult.Yes)
+				{
+					TryTopologifyReversed();
+					RefreshView();
+				}
+			}
 		}
 	}
 }

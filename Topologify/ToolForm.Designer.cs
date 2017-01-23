@@ -33,7 +33,6 @@
 			this.buttonMark = new System.Windows.Forms.Button();
 			this.buttonUpdate = new System.Windows.Forms.Button();
 			this.dataGridView = new System.Windows.Forms.DataGridView();
-			this.linkLabel = new System.Windows.Forms.LinkLabel();
 			this.ColumnDisplayed = new System.Windows.Forms.DataGridViewCheckBoxColumn();
 			this.ColumnId = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.ColumnWikiId = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -41,6 +40,8 @@
 			this.ColumnTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.markAsCompletedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.linkLabel = new System.Windows.Forms.LinkLabel();
+			this.checkBoxAllowReverse = new System.Windows.Forms.CheckBox();
 			this.tableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
 			this.contextMenuStrip.SuspendLayout();
@@ -48,14 +49,16 @@
 			// 
 			// tableLayoutPanel
 			// 
-			this.tableLayoutPanel.ColumnCount = 3;
+			this.tableLayoutPanel.ColumnCount = 4;
+			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel.Controls.Add(this.buttonMark, 1, 0);
-			this.tableLayoutPanel.Controls.Add(this.buttonUpdate, 2, 0);
+			this.tableLayoutPanel.Controls.Add(this.buttonMark, 2, 0);
+			this.tableLayoutPanel.Controls.Add(this.buttonUpdate, 3, 0);
 			this.tableLayoutPanel.Controls.Add(this.dataGridView, 0, 1);
 			this.tableLayoutPanel.Controls.Add(this.linkLabel, 0, 2);
+			this.tableLayoutPanel.Controls.Add(this.checkBoxAllowReverse, 0, 0);
 			this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel.Name = "tableLayoutPanel";
@@ -101,7 +104,7 @@
             this.ColumnWikiId,
             this.ColumnCategory,
             this.ColumnTitle});
-			this.tableLayoutPanel.SetColumnSpan(this.dataGridView, 3);
+			this.tableLayoutPanel.SetColumnSpan(this.dataGridView, 4);
 			this.dataGridView.ContextMenuStrip = this.contextMenuStrip;
 			this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.dataGridView.Location = new System.Drawing.Point(3, 32);
@@ -112,18 +115,6 @@
 			this.dataGridView.Size = new System.Drawing.Size(578, 313);
 			this.dataGridView.TabIndex = 2;
 			this.dataGridView.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_CellMouseDown);
-			// 
-			// linkLabel
-			// 
-			this.linkLabel.AutoSize = true;
-			this.tableLayoutPanel.SetColumnSpan(this.linkLabel, 3);
-			this.linkLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.linkLabel.Location = new System.Drawing.Point(3, 348);
-			this.linkLabel.Name = "linkLabel";
-			this.linkLabel.Size = new System.Drawing.Size(578, 13);
-			this.linkLabel.TabIndex = 3;
-			this.linkLabel.TabStop = true;
-			this.linkLabel.Text = "linkLabel1";
 			// 
 			// ColumnDisplayed
 			// 
@@ -174,6 +165,30 @@
 			this.markAsCompletedToolStripMenuItem.Text = "Mark as Completed";
 			this.markAsCompletedToolStripMenuItem.Click += new System.EventHandler(this.markAsCompletedToolStripMenuItem_Click);
 			// 
+			// linkLabel
+			// 
+			this.linkLabel.AutoSize = true;
+			this.tableLayoutPanel.SetColumnSpan(this.linkLabel, 4);
+			this.linkLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.linkLabel.Location = new System.Drawing.Point(3, 348);
+			this.linkLabel.Name = "linkLabel";
+			this.linkLabel.Size = new System.Drawing.Size(578, 13);
+			this.linkLabel.TabIndex = 3;
+			this.linkLabel.TabStop = true;
+			this.linkLabel.Text = "linkLabel1";
+			// 
+			// checkBoxAllowReverse
+			// 
+			this.checkBoxAllowReverse.AutoSize = true;
+			this.checkBoxAllowReverse.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.checkBoxAllowReverse.Location = new System.Drawing.Point(3, 3);
+			this.checkBoxAllowReverse.Name = "checkBoxAllowReverse";
+			this.checkBoxAllowReverse.Size = new System.Drawing.Size(228, 23);
+			this.checkBoxAllowReverse.TabIndex = 4;
+			this.checkBoxAllowReverse.Text = "Aggressive Detection of Completed Quests";
+			this.checkBoxAllowReverse.UseVisualStyleBackColor = true;
+			this.checkBoxAllowReverse.CheckedChanged += new System.EventHandler(this.checkBoxAllowReverse_CheckedChanged);
+			// 
 			// ToolForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -206,5 +221,6 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn ColumnTitle;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem markAsCompletedToolStripMenuItem;
+		private System.Windows.Forms.CheckBox checkBoxAllowReverse;
 	}
 }
