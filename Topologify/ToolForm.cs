@@ -290,5 +290,11 @@ namespace Topologify
 		{
 			Process.Start("http://kcwikizh.github.io/kcdata/");
 		}
+
+		private void copyToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Clipboard.SetText(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
+		}
+
 	}
 }
