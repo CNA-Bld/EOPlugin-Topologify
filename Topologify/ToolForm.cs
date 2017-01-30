@@ -293,6 +293,8 @@ namespace Topologify
 
 		private void copyToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			if (dataGridView.SelectedRows.Count != 1)
+				return;
 			Clipboard.SetText(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
 		}
 
