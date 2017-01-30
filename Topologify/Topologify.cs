@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Codeplex.Data;
 using ElectronicObserver.Data;
+using ElectronicObserver.Observer;
 using ElectronicObserver.Utility;
 using ElectronicObserver.Window.Plugins;
 
@@ -29,9 +30,24 @@ namespace Topologify
 		public Topologify()
 	    {
 		    LoadData();
+			APIObserver.Instance["api_req_quest/clearitemget"].RequestReceived += OnQuestCompleted;
 	    }
 
-		public Dictionary<int, ExtendedQuestData> Quests = new Dictionary<int, ExtendedQuestData>();
+	    private void OnQuestCompleted(string apiname, dynamic data)
+	    {
+			int id = int.Parse(data["api_quest_id"]);
+		    if (Quests.ContainsKey(id))
+		    {
+			    var quest = Quests[id];
+			    if (!quest.Recurring)
+			    {
+				    quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
+				    SaveRecord();
+			    }
+		    }
+	    }
+
+	    public Dictionary<int, ExtendedQuestData> Quests = new Dictionary<int, ExtendedQuestData>();
 
 		public void LoadData()
 		{
