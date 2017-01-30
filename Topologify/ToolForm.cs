@@ -298,5 +298,11 @@ namespace Topologify
 			Clipboard.SetText(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
 		}
 
+		private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+		{
+			if (dataGridView.SelectedRows.Count != 1)
+				return;
+			MessageBox.Show(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
+		}
 	}
 }
