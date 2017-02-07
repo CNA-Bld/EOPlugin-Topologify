@@ -41,8 +41,9 @@ namespace Topologify
 			    var quest = Quests[id];
 			    if (!quest.Recurring)
 			    {
-				    quest.Completed = ExtendedQuestData.Status.DerivedCompleted;
-				    SaveRecord();
+					var RecordData = LoadRecord();
+					RecordData.DerivedCompleted.Add(id);
+					File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(RecordData));
 			    }
 		    }
 	    }
