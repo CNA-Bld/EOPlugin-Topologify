@@ -84,17 +84,21 @@ namespace Topologify
         public void SaveRecord()
         {
             var recordData = LoadRecord();
-            recordData.DerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.DerivedCompleted)
-                .Concat(recordData.DerivedCompleted).Distinct().ToList(); // If DB does not know, keep.
-            recordData.MarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.MarkedCompleted);
-            recordData.AggressiveDerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveDerivedCompleted);
-            recordData.AggressiveMarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveMarkedCompleted);
+            recordData.DerivedCompleted =
+                UpdateIds(ExtendedQuestData.Status.DerivedCompleted, recordData.DerivedCompleted);
+            recordData.MarkedCompleted =
+                UpdateIds(ExtendedQuestData.Status.MarkedCompleted, recordData.MarkedCompleted);
+            recordData.AggressiveDerivedCompleted =
+                UpdateIds(ExtendedQuestData.Status.AggressiveDerivedCompleted, recordData.AggressiveDerivedCompleted);
+            recordData.AggressiveMarkedCompleted =
+                UpdateIds(ExtendedQuestData.Status.AggressiveMarkedCompleted, recordData.AggressiveMarkedCompleted);
             File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(recordData));
         }
 
-        private List<int> BuildQuestIds(ExtendedQuestData.Status status)
+        private List<int> UpdateIds(ExtendedQuestData.Status status, List<int> current)
         {
-            return Quests.Values.Where(q => q.Completed == status).Select(q => q.ID).ToList();
+            return Quests.Values.Where(q => q.Completed == status).Select(q => q.ID).ToList()
+                .Concat(current).Distinct().ToList(); // If DB does not know, keep.
         }
 
         public void UpdateData(Action action)
