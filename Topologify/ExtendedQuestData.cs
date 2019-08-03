@@ -8,13 +8,14 @@ namespace Topologify
 {
     public class ExtendedQuestData
     {
-        public int ID { get; set; }
-        public int Category { get; set; }
-        public bool Recurring { get; set; }
-        public string Title { get; set; }
-        public string Detail { get; set; }
-        public List<int> Prerequisite { get; set; }
-        public string WikiID { get; set; }
+        private dynamic RawData { get; set; }
+        public int ID => (int) RawData.game_id;
+        public int Category => (int) RawData.category;
+        public bool Recurring => (int) RawData.type != 1;  
+        public string Title => (string) RawData.name;
+        public string Detail => ((string) RawData.detail).Replace("<br>", "\n");
+        public List<int> Prerequisite => ((int[]) RawData.prerequisite).ToList();
+        public string WikiID => (string) RawData.wiki_id;
 
         public enum Status
         {
@@ -50,23 +51,11 @@ namespace Topologify
 
         public static ExtendedQuestData FromJson(dynamic json)
         {
-            ExtendedQuestData data = new ExtendedQuestData
+            return new ExtendedQuestData
             {
-                ID = (int) json.id,
-                Category = (int) json.category,
-                Recurring = (int) json.type != 4,
-                Title = (string) json.title,
-                Detail = ((string) json.detail).Replace("<br>", "\n"),
-                Prerequisite = new List<int>(),
-                WikiID = (string) json.wiki_id,
+                RawData = json,
                 Completed = Status.Unknown
             };
-            foreach (var i in json.prerequisite)
-            {
-                data.Prerequisite.Add((int) i);
-            }
-
-            return data;
         }
     }
 }

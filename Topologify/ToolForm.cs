@@ -77,7 +77,8 @@ namespace Topologify
         private List<ExtendedQuestData> BuildPrerequisiteTree(ExtendedQuestData quest)
         {
             var prerequisiteQuests = new List<ExtendedQuestData>();
-            foreach (var pre in quest.Prerequisite.Select(i => plugin.Quests[i]))
+            foreach (var pre in quest.Prerequisite.Where(i => plugin.Quests.ContainsKey(i))
+                .Select(i => plugin.Quests[i]))
             {
                 if (pre.IsCompleted)
                     continue;

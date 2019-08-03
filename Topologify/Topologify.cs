@@ -26,7 +26,7 @@ namespace Topologify
         public override string Version => "<BUILD_VERSION>";
 
         private static string JSON_PATH = @"Data\quest.json";
-        private static Uri JSON_URL = new Uri("https://kcwikizh.github.io/kcdata/quest/all.json");
+        private static Uri JSON_URL = new Uri("https://kcwikizh.github.io/kcdata/quest/poi.json");
         private static string RECORD_PATH = @"Record\Topologify.json";
 
         public Topologify()
@@ -56,7 +56,9 @@ namespace Topologify
         {
             if (!Directory.Exists("Data"))
                 Directory.CreateDirectory("Data");
-            if (File.Exists(JSON_PATH))
+            if (!File.Exists(JSON_PATH)) return;
+
+            try
             {
                 var json = DynamicJson.Parse(File.ReadAllText(JSON_PATH));
 
@@ -66,6 +68,10 @@ namespace Topologify
                     ExtendedQuestData questData = ExtendedQuestData.FromJson(quest);
                     Quests.Add(questData.ID, questData);
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.Add(2, $"Topologify: Failed to load quests JSON. Please try update data. ({e})");
             }
         }
 
