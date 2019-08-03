@@ -102,7 +102,11 @@ namespace Topologify
             if (!quest.Recurring)
                 quest.Completed = status;
 
-            quest.Prerequisite.ForEach(q => MarkQuestTree(plugin.Quests[q], status));
+            quest.Prerequisite.ForEach(q =>
+            {
+                if (plugin.Quests.ContainsKey(q))
+                    MarkQuestTree(plugin.Quests[q], status);
+            });
         }
 
         private void TryTopologifyReversed()
