@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -159,8 +159,11 @@ namespace Topologify
         {
             foreach (var id in questIds)
             {
+                if (!plugin.Quests.ContainsKey(id)) // Don't care if DB is not updated yet.
+                    continue;
+
                 var quest = plugin.Quests[id];
-                if (quest.IsCompleted)
+                if (quest.IsCompleted || quest.Recurring) // Happens when we remembered some recurring quests.
                     continue;
                 if (treeStatus != null)
                     MarkQuestTree(quest, treeStatus.Value);
@@ -184,8 +187,7 @@ namespace Topologify
 
             var quest = plugin.Quests[(int) dataGridView.SelectedRows[0].Cells[ColumnId.Index].Value];
             if (MessageBox.Show(
-                    string.Format("Sure to mark {0} as completed? This will also mark all its prerequisite.",
-                        quest.Description),
+                    $"Sure to mark {quest.Description} as completed? This will also mark all its prerequisite.",
                     "Confirm",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning,

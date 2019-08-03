@@ -38,16 +38,15 @@ namespace Topologify
         private void OnQuestCompleted(string apiname, dynamic data)
         {
             int id = int.Parse(data["api_quest_id"]);
-            if (Quests.ContainsKey(id))
-            {
-                var quest = Quests[id];
-                if (!quest.Recurring)
-                {
-                    var recordData = LoadRecord();
-                    recordData.DerivedCompleted.Add(id);
-                    File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(recordData));
-                }
-            }
+            if (Quests.ContainsKey(id) && Quests[id].Recurring)
+                return;
+
+            // If DB does not know about the quest yet, we still remember it.
+            // (even if it's recurring - we would ignore it later when loading.)
+
+            var recordData = LoadRecord();
+            recordData.DerivedCompleted.Add(id);
+            File.WriteAllText(RECORD_PATH, DynamicJson.Serialize(recordData));
         }
 
         public readonly Dictionary<int, ExtendedQuestData> Quests = new Dictionary<int, ExtendedQuestData>();
@@ -84,8 +83,9 @@ namespace Topologify
 
         public void SaveRecord()
         {
-            var recordData = new Record();
-            recordData.DerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.DerivedCompleted);
+            var recordData = LoadRecord();
+            recordData.DerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.DerivedCompleted)
+                .Concat(recordData.DerivedCompleted).Distinct().ToList(); // If DB does not know, keep.
             recordData.MarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.MarkedCompleted);
             recordData.AggressiveDerivedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveDerivedCompleted);
             recordData.AggressiveMarkedCompleted = BuildQuestIds(ExtendedQuestData.Status.AggressiveMarkedCompleted);
