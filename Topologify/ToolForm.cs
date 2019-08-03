@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -71,7 +71,9 @@ namespace Topologify
 
         private static string BuildDescription(ExtendedQuestData quest)
         {
-            return quest.Description + (KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) ? " <=" : "");
+            return quest.Description
+                   + (quest.Recurring ? " (R)" : "")
+                   + (KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) ? " <=" : "");
         }
 
         private List<ExtendedQuestData> BuildPrerequisiteTree(ExtendedQuestData quest)
