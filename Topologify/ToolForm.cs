@@ -14,295 +14,303 @@ using ElectronicObserver.Data;
 
 namespace Topologify
 {
-	public partial class ToolForm : Form
-	{
-		private Topologify plugin;
-		private bool isQuestDataAvailable = false;
-		
-		public ToolForm(Topologify plugin)
-		{
-			InitializeComponent();
-			this.plugin = plugin;
-		}
+    public partial class ToolForm : Form
+    {
+        private Topologify plugin;
+        private bool isQuestDataAvailable = false;
 
-		private void ToolForm_Load(object sender, EventArgs e)
-		{
-			if (!KCDatabase.Instance.Quest.IsLoadCompleted)
-			{
-				MessageBox.Show("Please load all quests by visiting all pages first.");
-				Close();
-				return;
-			}
+        public ToolForm(Topologify plugin)
+        {
+            InitializeComponent();
+            this.plugin = plugin;
+        }
 
-			if (plugin.Quests.Count > 0)
-				isQuestDataAvailable = true;
+        private void ToolForm_Load(object sender, EventArgs e)
+        {
+            if (!KCDatabase.Instance.Quest.IsLoadCompleted)
+            {
+                MessageBox.Show("Please load all quests by visiting all pages first.");
+                Close();
+                return;
+            }
 
-			TryTopologify();
-			RefreshView();
-		}
+            if (plugin.Quests.Count > 0)
+                isQuestDataAvailable = true;
 
-		private void RefreshView()
-		{
-			dataGridView.Rows.Clear();
+            TryTopologify();
+            RefreshView();
+        }
 
-			foreach (var ext in plugin.Quests.Values)
-			{
-				if (ext.Recurring || ext.isCompleted)
-					continue;
+        private void RefreshView()
+        {
+            dataGridView.Rows.Clear();
 
-				var row = new DataGridViewRow();
-				row.CreateCells(dataGridView);
+            foreach (var ext in plugin.Quests.Values)
+            {
+                if (ext.Recurring || ext.IsCompleted)
+                    continue;
 
-				row.Cells[ColumnDisplayed.Index].Value = KCDatabase.Instance.Quest.Quests.ContainsKey(ext.ID);
-				row.Cells[ColumnId.Index].Value = ext.ID;
-				row.Cells[ColumnWikiId.Index].Value = ext.WikiID;
-				row.Cells[ColumnCategory.Index].Value = Constants.GetQuestCategory(ext.Category);
-				row.Cells[ColumnTitle.Index].Value = ext.Title;
+                var row = new DataGridViewRow();
+                row.CreateCells(dataGridView);
 
-				var tree = BuildPrerequisiteTree(ext);
-				row.Cells[ColumnTitle.Index].ToolTipText = ext.Description + "\n" + ext.Detail + "\n\n" + string.Join("\n", tree.Select(BuildDescription));
+                row.Cells[ColumnDisplayed.Index].Value = KCDatabase.Instance.Quest.Quests.ContainsKey(ext.ID);
+                row.Cells[ColumnId.Index].Value = ext.ID;
+                row.Cells[ColumnWikiId.Index].Value = ext.WikiID;
+                row.Cells[ColumnCategory.Index].Value = Constants.GetQuestCategory(ext.Category);
+                row.Cells[ColumnTitle.Index].Value = ext.Title;
 
-				dataGridView.Rows.Add(row);
-			}
+                var tree = BuildPrerequisiteTree(ext);
+                row.Cells[ColumnTitle.Index].ToolTipText = ext.Description + "\n" + ext.Detail + "\n\n" +
+                                                           string.Join("\n", tree.Select(BuildDescription));
 
-			dataGridView.Sort(ColumnWikiId, ListSortDirection.Ascending);
-		}
+                dataGridView.Rows.Add(row);
+            }
 
-		private string BuildDescription(ExtendedQuestData quest)
-		{
-			return quest.Description + (KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) ? " <=" : "");
-		}
+            dataGridView.Sort(ColumnWikiId, ListSortDirection.Ascending);
+        }
 
-		private List<ExtendedQuestData> BuildPrerequisiteTree(ExtendedQuestData quest)
-		{
-			List<ExtendedQuestData> prerequisiteQuests = new List<ExtendedQuestData>();
-			foreach (var pre in quest.Prerequisite.Select(i => plugin.Quests[i]))
-			{
-				if (pre.isCompleted)
-					continue;
-				List<ExtendedQuestData> thisPreStrs = new List<ExtendedQuestData>();
-				if (!KCDatabase.Instance.Quest.Quests.ContainsKey(pre.ID))
-					thisPreStrs.AddRange(BuildPrerequisiteTree(pre));
-				thisPreStrs.Add(pre);
-				prerequisiteQuests.AddRange(thisPreStrs);
-			}
-			return prerequisiteQuests.Distinct().ToList();
-		}
+        private static string BuildDescription(ExtendedQuestData quest)
+        {
+            return quest.Description + (KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) ? " <=" : "");
+        }
 
-		private void MarkQuestTree(ExtendedQuestData quest, ExtendedQuestData.Status status)
-		{
-			if (quest.isCompleted)
-				return;
+        private List<ExtendedQuestData> BuildPrerequisiteTree(ExtendedQuestData quest)
+        {
+            var prerequisiteQuests = new List<ExtendedQuestData>();
+            foreach (var pre in quest.Prerequisite.Select(i => plugin.Quests[i]))
+            {
+                if (pre.IsCompleted)
+                    continue;
+                var thisPreStrs = new List<ExtendedQuestData>();
+                if (!KCDatabase.Instance.Quest.Quests.ContainsKey(pre.ID))
+                    thisPreStrs.AddRange(BuildPrerequisiteTree(pre));
+                thisPreStrs.Add(pre);
+                prerequisiteQuests.AddRange(thisPreStrs);
+            }
 
-			if (!quest.Recurring)
-				quest.Completed = status;
+            return prerequisiteQuests.Distinct().ToList();
+        }
 
-			quest.Prerequisite.ForEach(q => MarkQuestTree(plugin.Quests[q], status));
-		}
+        private void MarkQuestTree(ExtendedQuestData quest, ExtendedQuestData.Status status)
+        {
+            if (quest.IsCompleted)
+                return;
 
-		private void TryTopologifyReversed()
-		{
-			if (!checkBoxAllowReverse.Checked)
-				return;
+            if (!quest.Recurring)
+                quest.Completed = status;
 
-			bool flag = true;
-			while (flag)
-			{
-				flag = false;
-				foreach (var quest in plugin.Quests.Values.Where(q => !q.isCompleted))
-				{
-					if (!KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) && quest.Prerequisite.All(q => plugin.Quests[q].isCompleted))
-					{
-						if (quest.Prerequisite.Any(q => !plugin.Quests[q].isDerivedCompleted))
-							quest.Completed = ExtendedQuestData.Status.AggressiveMarkedCompleted;
-						else
-							quest.Completed = ExtendedQuestData.Status.AggressiveDerivedCompleted;
-						flag = true;
-					}
-				}
-			}
-		}
+            quest.Prerequisite.ForEach(q => MarkQuestTree(plugin.Quests[q], status));
+        }
 
-		private void TryTopologify()
-		{
-			foreach (var id in KCDatabase.Instance.Quest.Quests.Keys)
-			{
-				if (!plugin.Quests.ContainsKey(id))
-					continue;
-				var ext = plugin.Quests[id];
-				MarkQuestTree(ext, ExtendedQuestData.Status.DerivedCompleted);
-				ext.Completed = ExtendedQuestData.Status.DerivedUncompleted;
-			}
+        private void TryTopologifyReversed()
+        {
+            if (!checkBoxAllowReverse.Checked)
+                return;
 
-			if (plugin.Quests.Count == 0)
-				return;
+            bool flag = true;
+            while (flag)
+            {
+                flag = false;
+                foreach (var quest in plugin.Quests.Values.Where(q => !q.IsCompleted))
+                {
+                    if (!KCDatabase.Instance.Quest.Quests.ContainsKey(quest.ID) &&
+                        quest.Prerequisite.All(q => plugin.Quests[q].IsCompleted))
+                    {
+                        if (quest.Prerequisite.Any(q => !plugin.Quests[q].IsDerivedCompleted))
+                            quest.Completed = ExtendedQuestData.Status.AggressiveMarkedCompleted;
+                        else
+                            quest.Completed = ExtendedQuestData.Status.AggressiveDerivedCompleted;
+                        flag = true;
+                    }
+                }
+            }
+        }
 
-			Record RecordData = plugin.LoadRecord();
-			RestoreStatus(RecordData.DerivedCompleted, ExtendedQuestData.Status.DerivedCompleted,
-				ExtendedQuestData.Status.DerivedCompleted);
-			RestoreStatus(RecordData.MarkedCompleted, ExtendedQuestData.Status.MarkedCompleted,
-				ExtendedQuestData.Status.MarkedTreeCompleted);
-			RestoreStatus(RecordData.AggressiveDerivedCompleted, ExtendedQuestData.Status.AggressiveDerivedCompleted, null);
-			RestoreStatus(RecordData.AggressiveMarkedCompleted, ExtendedQuestData.Status.AggressiveMarkedCompleted, null);
-		}
+        private void TryTopologify()
+        {
+            foreach (var id in KCDatabase.Instance.Quest.Quests.Keys)
+            {
+                if (!plugin.Quests.ContainsKey(id))
+                    continue;
+                var ext = plugin.Quests[id];
+                MarkQuestTree(ext, ExtendedQuestData.Status.DerivedCompleted);
+                ext.Completed = ExtendedQuestData.Status.DerivedUncompleted;
+            }
 
-		private void RestoreStatus(List<int> questIds, ExtendedQuestData.Status thisStatus,
-			ExtendedQuestData.Status? treeStatus)
-		{
-			foreach (var id in questIds)
-			{
-				var quest = plugin.Quests[id];
-				if (quest.isCompleted)
-					continue;
-				if (treeStatus != null)
-					MarkQuestTree(quest, treeStatus.Value);
-				quest.Completed = thisStatus;
-			}
-		}
+            if (plugin.Quests.Count == 0)
+                return;
 
-		private void dataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Right && e.RowIndex > -1)
-			{
-				dataGridView.ClearSelection();
-				dataGridView.Rows[e.RowIndex].Selected = true;
-			}
-		}
+            Record RecordData = plugin.LoadRecord();
+            RestoreStatus(RecordData.DerivedCompleted, ExtendedQuestData.Status.DerivedCompleted,
+                ExtendedQuestData.Status.DerivedCompleted);
+            RestoreStatus(RecordData.MarkedCompleted, ExtendedQuestData.Status.MarkedCompleted,
+                ExtendedQuestData.Status.MarkedTreeCompleted);
+            RestoreStatus(RecordData.AggressiveDerivedCompleted, ExtendedQuestData.Status.AggressiveDerivedCompleted,
+                null);
+            RestoreStatus(RecordData.AggressiveMarkedCompleted, ExtendedQuestData.Status.AggressiveMarkedCompleted,
+                null);
+        }
 
-		private void markAsCompletedToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (dataGridView.SelectedRows.Count != 1)
-				return;
+        private void RestoreStatus(List<int> questIds, ExtendedQuestData.Status thisStatus,
+            ExtendedQuestData.Status? treeStatus)
+        {
+            foreach (var id in questIds)
+            {
+                var quest = plugin.Quests[id];
+                if (quest.IsCompleted)
+                    continue;
+                if (treeStatus != null)
+                    MarkQuestTree(quest, treeStatus.Value);
+                quest.Completed = thisStatus;
+            }
+        }
 
-			var quest = plugin.Quests[(int) dataGridView.SelectedRows[0].Cells[ColumnId.Index].Value];
-			if (MessageBox.Show(
-				string.Format("Sure to mark {0} as completed? This will also mark all its prerequisite.", quest.Description),
-				"Confirm",
-				MessageBoxButtons.YesNo,
-				MessageBoxIcon.Warning,
-				MessageBoxDefaultButton.Button2
-				) == DialogResult.Yes)
-			{
-				if (quest.Completed == ExtendedQuestData.Status.DerivedUncompleted ||
-				    BuildPrerequisiteTree(quest).Any(q => (!q.Recurring) && q.Completed == ExtendedQuestData.Status.DerivedUncompleted))
-				{
-					MessageBox.Show("Impossible lah.");
-					return;
-				}
+        private void dataGridView_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.RowIndex > -1)
+            {
+                dataGridView.ClearSelection();
+                dataGridView.Rows[e.RowIndex].Selected = true;
+            }
+        }
 
-				MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
-				quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
-				TryTopologifyReversed();
-				RefreshView();
-			}
-		}
+        private void markAsCompletedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridView.SelectedRows.Count != 1)
+                return;
 
-		private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			if (isQuestDataAvailable)
-				plugin.SaveRecord();
-		}
+            var quest = plugin.Quests[(int) dataGridView.SelectedRows[0].Cells[ColumnId.Index].Value];
+            if (MessageBox.Show(
+                    string.Format("Sure to mark {0} as completed? This will also mark all its prerequisite.",
+                        quest.Description),
+                    "Confirm",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning,
+                    MessageBoxDefaultButton.Button2
+                ) == DialogResult.Yes)
+            {
+                if (quest.Completed == ExtendedQuestData.Status.DerivedUncompleted ||
+                    BuildPrerequisiteTree(quest).Any(q =>
+                        (!q.Recurring) && q.Completed == ExtendedQuestData.Status.DerivedUncompleted))
+                {
+                    MessageBox.Show("Impossible lah.");
+                    return;
+                }
 
-		private void checkBoxAllowReverse_CheckedChanged(object sender, EventArgs e)
-		{
-			if (checkBoxAllowReverse.Checked)
-			{
-				if (MessageBox.Show(
-					string.Join("\n",
-						"Enabling this will cause Topologify to consider all quests",
-						"1) not displaying",
-						"2) whose prerequisite are completed",
-						"as completed.",
-						"",
-						"DO NOT USE THIS WHEN THERE ARE STILL 検証中!",
-						"",
-						"",
-						"Should Topologify enable this and aggressively check all quests now?"
-						), "Confirm",
-					MessageBoxButtons.YesNo,
-					MessageBoxIcon.Warning,
-					MessageBoxDefaultButton.Button2
-					) == DialogResult.Yes)
-				{
-					TryTopologifyReversed();
-					RefreshView();
-				}
-				else
-				{
-					checkBoxAllowReverse.Checked = false;
-				}
-			}
-		}
+                MarkQuestTree(quest, ExtendedQuestData.Status.MarkedTreeCompleted);
+                quest.Completed = ExtendedQuestData.Status.MarkedCompleted;
+                TryTopologifyReversed();
+                RefreshView();
+            }
+        }
 
-		private void buttonReset_Click(object sender, EventArgs e)
-		{
-			contextMenuStripReset.Show(buttonReset, new Point(0, buttonReset.Height));
-		}
+        private void ToolForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isQuestDataAvailable)
+                plugin.SaveRecord();
+        }
 
-		private void doReset(string message, Func<ExtendedQuestData, bool> where)
-		{
-			if (MessageBox.Show(
-				message, "Confirm",
-				MessageBoxButtons.YesNo,
-				MessageBoxIcon.Warning,
-				MessageBoxDefaultButton.Button2
-				) == DialogResult.Yes)
-			{
-				foreach (var quest in plugin.Quests.Values.Where(where))
-				{
-					quest.Completed = ExtendedQuestData.Status.Unknown;
-				}
-				MessageBox.Show("Topologify will now close.");
-				Close();
-			}
-		}
+        private void checkBoxAllowReverse_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxAllowReverse.Checked)
+            {
+                if (MessageBox.Show(
+                        string.Join("\n",
+                            "Enabling this will cause Topologify to consider all quests",
+                            "1) not displaying",
+                            "2) whose prerequisite are completed",
+                            "as completed.",
+                            "",
+                            "DO NOT USE THIS WHEN THERE ARE STILL 検証中!",
+                            "",
+                            "",
+                            "Should Topologify enable this and aggressively check all quests now?"
+                        ), "Confirm",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2
+                    ) == DialogResult.Yes)
+                {
+                    TryTopologifyReversed();
+                    RefreshView();
+                }
+                else
+                {
+                    checkBoxAllowReverse.Checked = false;
+                }
+            }
+        }
 
-		private void aggressivelyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			doReset("Sure to reset all aggressively marked quests?", q => q.isAggressive);
-		}
+        private void buttonReset_Click(object sender, EventArgs e)
+        {
+            contextMenuStripReset.Show(buttonReset, new Point(0, buttonReset.Height));
+        }
 
-		private void manuallyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			doReset("Sure to reset all manually marked quests?", q => q.isManual);
-		}
+        private void doReset(string message, Func<ExtendedQuestData, bool> where)
+        {
+            if (MessageBox.Show(
+                    message, "Confirm",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning,
+                    MessageBoxDefaultButton.Button2
+                ) == DialogResult.Yes)
+            {
+                foreach (var quest in plugin.Quests.Values.Where(where))
+                {
+                    quest.Completed = ExtendedQuestData.Status.Unknown;
+                }
 
-		private void everythingToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			doReset("Sure to reset everything?", q => true);
-		}
+                MessageBox.Show("Topologify will now close.");
+                Close();
+            }
+        }
 
-		private void OnUpdated()
-		{
-			MessageBox.Show("Data updated. Topologify will now close.");
-			TryTopologify();
-			Close();
-		}
+        private void aggressivelyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            doReset("Sure to reset all aggressively marked quests?", q => q.IsAggressive);
+        }
 
-		private void buttonUpdate_Click(object sender, EventArgs e)
-		{
-			buttonUpdate.Enabled = false;
-			buttonUpdate.Text = "Updating...";
-			plugin.UpdateData(OnUpdated);
-		}
+        private void manuallyMarkedQuestsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            doReset("Sure to reset all manually marked quests?", q => q.IsManual);
+        }
 
-		private void linkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-		{
-			Process.Start("http://kcwikizh.github.io/kcdata/");
-		}
+        private void everythingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            doReset("Sure to reset everything?", q => true);
+        }
 
-		private void copyToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (dataGridView.SelectedRows.Count != 1)
-				return;
-			Clipboard.SetText(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
-		}
+        private void OnUpdated()
+        {
+            MessageBox.Show("Data updated. Topologify will now close.");
+            TryTopologify();
+            Close();
+        }
 
-		private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-		{
-			if (dataGridView.SelectedRows.Count != 1)
-				return;
-			MessageBox.Show(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
-		}
-	}
+        private void buttonUpdate_Click(object sender, EventArgs e)
+        {
+            buttonUpdate.Enabled = false;
+            buttonUpdate.Text = "Updating...";
+            plugin.UpdateData(OnUpdated);
+        }
+
+        private void linkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://kcwikizh.github.io/kcdata/");
+        }
+
+        private void copyToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridView.SelectedRows.Count != 1)
+                return;
+            Clipboard.SetText(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
+        }
+
+        private void dataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridView.SelectedRows.Count != 1)
+                return;
+            MessageBox.Show(dataGridView.SelectedRows[0].Cells[ColumnTitle.Index].ToolTipText);
+        }
+    }
 }

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Topologify
 {
-	public class Record
-	{
-		public List<int> DerivedCompleted { get; set; } = new List<int>();
-		public List<int> MarkedCompleted { get; set; } = new List<int>();
-		public List<int> AggressiveDerivedCompleted { get; set; } = new List<int>();
-		public List<int> AggressiveMarkedCompleted { get; set; } = new List<int>();
-	}
+    public class Record
+    {
+        public List<int> DerivedCompleted { get; set; } = new List<int>();
+        public List<int> MarkedCompleted { get; set; } = new List<int>();
+        public List<int> AggressiveDerivedCompleted { get; set; } = new List<int>();
+        public List<int> AggressiveMarkedCompleted { get; set; } = new List<int>();
+    }
 }
